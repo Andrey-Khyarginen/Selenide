@@ -1,3 +1,4 @@
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Configuration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,23 +14,23 @@ import static com.codeborne.selenide.Selenide.*;
 public class TestCard {
 
 
-    public String generateDate(int days) {
-        return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    private String generateDate(int days, String pattern) {
+        return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern(pattern));
     }
     @Test
-    void shouldSendForm() {
+    public void shouldSendForm() {
         Configuration.holdBrowserOpen = true;
         open("http://localhost:9999/");
         $("[data-test-id=city] input").setValue("Саратов");
-        String currentDate = generateDate(3);
-        $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-        $("[data-test-id=date] input").setValue(currentDate);
-        $("[data-test-id=name] input").setValue("Алеша Васин");
-        $("[data-test-id=phone] input").setValue("+9998887766");
+        String currentDate = generateDate(4,"dd.MM.yyyy");
+        $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.DELETE);
+        $("[data-test-id=date] input").sendKeys(currentDate);
+        $("[data-test-id=name] input").setValue("Алеша-Алешин Васин");
+        $("[data-test-id=phone] input").setValue("+79998887766");
         $("[data-test-id=agreement]").click();
-        $$("button").find(exactText("Забронировать")).click();
-        $x("//*[@class='notification__content']")
-                .shouldBe(visible, Duration.ofSeconds(15))
-                .shouldHave(exactText("Встреча успешно забронирована на " + currentDate));
+        $("button.button").click();
+        $(".notification__content']")
+                .shouldBe(Condition.visible, Duration.ofSeconds(15))
+                .shouldHave(Condition.exactText("Встреча успешно забронирована на " + currentDate));
     }
 }
